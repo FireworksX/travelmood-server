@@ -19,6 +19,7 @@ class WSSService {
 
   broadcast(eventName: string, payload?: any) {
     const data = JSON.stringify({ eventName, payload });
+    console.log('Broadcast:', eventName, payload);
     this.wsServer.clients.forEach(ws => {
       ws.send(data);
     });
