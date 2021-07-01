@@ -1,10 +1,8 @@
 module.exports = {
   apps: [
     {
-      name: 'myapp',
-      // package.json에 정의된 npm run start를 실행하게 해서 PM2로 관리하게 한다.
-      script: 'npm',
-      args: 'run dev',
+      name: 'tripper-server',
+      script: './dist/server.js',
       instances: 2,
       autorestart: true,
       watch: false,
@@ -13,14 +11,14 @@ module.exports = {
       // pm2 start ecosystem.config.js
       env: {
         HOST: '0.0.0.0',
-        PORT: 3000,
+        PORT: 5000,
         NODE_ENV: 'development',
       },
       // production mode
       // pm2 start ecosystem.config.js --env production
       env_production: {
         HOST: '0.0.0.0',
-        PORT: 3000,
+        PORT: 5000,
         NODE_ENV: 'production',
       },
       output: './logs/console.log',
