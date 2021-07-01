@@ -12,7 +12,7 @@ module.exports = {
       env: {
         HOST: '0.0.0.0',
         PORT: 5000,
-        NODE_ENV: 'development',
+        NODE_ENV: 'production',
       },
       // production mode
       // pm2 start ecosystem.config.js --env production
