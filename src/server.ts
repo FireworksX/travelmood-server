@@ -1,5 +1,6 @@
 process.env['NODE_CONFIG_DIR'] = __dirname + '/configs';
-
+import 'reflect-metadata';
+import 'es6-shim';
 import 'dotenv/config';
 import App from '@/app';
 import AuthRoute from '@routes/auth.route';

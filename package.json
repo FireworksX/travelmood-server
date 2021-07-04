@@ -1,7 +1,7 @@
 {
-  "name": "typescript-express-starter",
-  "version": "0.0.0",
-  "description": "TypeScript + Sequelize + MySQL + Express API Server",
+  "name": "travelmood-server",
+  "version": "0.0.1",
+  "description": "TravelMood server",
   "author": "",
   "license": "ISC",
   "scripts": {
@@ -24,6 +24,7 @@
     "cross-env": "^7.0.3",
     "dotenv": "^10.0.0",
     "envalid": "^7.1.0",
+    "es6-shim": "^0.35.6",
     "express": "^4.17.1",
     "helmet": "^4.6.0",
     "hpp": "^0.2.3",
@@ -33,6 +34,7 @@
     "mysql2": "^2.2.5",
     "pg": "^8.6.0",
     "pg-hstore": "^2.3.4",
+    "reflect-metadata": "^0.1.13",
     "sequelize": "^6.6.4",
     "swagger-jsdoc": "^6.0.0",
     "swagger-ui-express": "^4.1.6",

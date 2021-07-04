@@ -4,10 +4,13 @@ import HttpException from '@exceptions/HttpException';
 import { isEmpty } from '@utils/util';
 import { Request } from '@interfaces/requests.interface';
 import WSSService from '@services/wss.service';
+import { Op } from 'sequelize';
+import UserService from '@services/users.service';
 
 class RequestsService {
   public requests = DB.Requests;
   public users = DB.Users;
+  public usersService = new UserService();
   public wssService = new WSSService();
 
   public async findAllRequests(): Promise<Request[]> {
@@ -28,7 +31,6 @@ class RequestsService {
     if (isEmpty(requestData)) throw new HttpException(400, "You're not request");
 
     const { request_id, guide_id } = requestData;
-
     const findRequest: Request = await this.requests.findByPk(request_id, { raw: true });
     if (!findRequest) throw new HttpException(409, "You're not request");
 
@@ -38,10 +40,13 @@ class RequestsService {
     };
 
     await this.requests.update(formatData, { where: { id: request_id } });
+    const updateRequest: Request = await this.requests.findByPk(request_id, { raw: true });
+    const fullGuides = await Promise.all(updateRequest.accept_guides.map(id => this.usersService.findUserById(id)));
 
-    const updateRequest: Request = await this.requests.findByPk(request_id);
-
-    this.wssService.broadcast('acceptRequest', updateRequest);
+    this.wssService.broadcast('acceptRequest', {
+      ...updateRequest,
+      accept_guides: fullGuides,
+    });
 
     return updateRequest;
   }
@@ -50,16 +55,12 @@ class RequestsService {
     if (isEmpty(requestData)) throw new HttpException(400, "You're not request");
 
     const createRequestData: Request = (await this.requests.create(requestData)).get({ plain: true });
+    const guides = await this.users.findAll({ where: { role: { [Op.contains]: ['guide'] } }, raw: true });
 
-    const guides = (await this.users.findAll({ where: { role: ['guide'] } })).map(guide => ({
-      id: guide.id,
-      username: guide.username,
-      tg_chat_id: guide.tg_chat_id,
-    }));
-
+    const guidesWithContacts = await Promise.all(guides.map(guide => this.usersService.mergeUser(guide)));
     this.wssService.broadcast('createRequest', {
       ...createRequestData,
-      guides,
+      guides: guidesWithContacts,
     });
 
     return createRequestData;

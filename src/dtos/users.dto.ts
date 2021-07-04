@@ -1,5 +1,7 @@
-import { IsString, IsEmail, IsOptional, IsEnum, IsNumber } from 'class-validator';
+import { IsString, IsOptional, IsEnum, ValidateNested, IsArray } from 'class-validator';
 import { UserRole } from '@interfaces/users.interface';
+import { CreateContactDto } from '@dtos/contacts.dto';
+import { Type } from 'class-transformer';
 
 enum RoleEnum {
   guide = 'guide',
@@ -19,16 +21,11 @@ export class CreateUserDto {
   @IsString()
   public username: string;
 
-  @IsOptional()
-  @IsEmail()
-  public email: string;
+  @IsArray()
+  public contacts: CreateContactDto[];
 
   @IsString()
   public password: string;
-
-  @IsOptional()
-  @IsNumber()
-  public tg_chat_id: number;
 
   @IsEnum(RoleEnum, { each: true })
   public role: UserRole[];

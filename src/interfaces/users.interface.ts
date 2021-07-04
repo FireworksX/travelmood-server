@@ -1,12 +1,23 @@
+import { ContactCell } from '@interfaces/contacts.interface';
+
 export type UserRole = 'guide' | 'client' | 'admin';
 
 export interface User {
   id: number;
   first_name: string | null;
   last_name: string | null;
-  email: string | null;
   username: string;
   password: string;
   role: UserRole[];
-  tg_chat_id: number | null;
+  contacts: number[];
+}
+
+export interface UserExtend {
+  id: number;
+  first_name: string | null;
+  last_name: string | null;
+  username: string;
+  password: string;
+  role: UserRole[];
+  contacts: ContactCell[];
 }

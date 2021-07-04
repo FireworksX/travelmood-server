@@ -3,6 +3,7 @@ import Sequelize from 'sequelize';
 import { dbConfig } from '@interfaces/db.interface';
 import UserModel from '@models/users.model';
 import RequestModel from '@models/requests.model';
+import ContactsModel from '@models/contacts.model';
 import { logger } from '@utils/logger';
 
 const { host, user, password, database, pool }: dbConfig = config.get('dbConfig');
@@ -31,6 +32,7 @@ sequelize.authenticate();
 const DB = {
   Users: UserModel(sequelize),
   Requests: RequestModel(sequelize),
+  Contacts: ContactsModel(sequelize),
   sequelize, // connection instance (RAW queries)
   Sequelize, // library
 };
