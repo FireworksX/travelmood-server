@@ -1,10 +1,6 @@
 {
   "env": "production",
   "dbConfig": {
-    "host": "45.55.56.152",
-    "user": "postgres",
-    "password": "",
-    "database": "travelmood",
     "pool": {
       "min": 0,
       "max": 5

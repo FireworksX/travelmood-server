@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'tripper-server',
+      name: 'travelmood-server',
       script: './dist/server.js',
       autorestart: true,
       watch: false,
