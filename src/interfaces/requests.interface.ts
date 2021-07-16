@@ -6,6 +6,7 @@ export interface Request {
   name: string;
   city: string;
   text: string;
+  date: string;
   phone: string | null;
   accept_guides: number[];
 }

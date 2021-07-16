@@ -9,6 +9,7 @@ export class RequestModel extends Model<Request, RequestCreationAttributes> impl
   public name: string;
   public city: string;
   public text: string;
+  public date: string;
   public phone: string | null;
   public accept_guides: number[];
 
@@ -32,6 +33,9 @@ export default function (sequelize: Sequelize): typeof RequestModel {
       },
       city: {
         type: DataTypes.STRING(45),
+      },
+      date: {
+        type: DataTypes.STRING,
       },
       text: {
         type: DataTypes.STRING(255),

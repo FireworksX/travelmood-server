@@ -13,6 +13,9 @@ export class CreateRequestDto {
   @IsString()
   public text: string;
 
+  @IsString()
+  public date: string;
+
   @IsOptional()
   @IsString()
   public phone: string;
