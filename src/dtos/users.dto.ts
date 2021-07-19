@@ -24,6 +24,9 @@ export class CreateUserDto {
   @IsArray()
   public contacts: CreateContactDto[];
 
+  @IsArray()
+  public cities: number[];
+
   @IsString()
   public password: string;
 

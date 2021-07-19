@@ -11,6 +11,7 @@ export class UserModel extends Model<User, UserCreationAttributes> implements Us
   public username: string;
   public role: UserRole[];
   public contacts: number[];
+  public cities: number[];
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
@@ -42,6 +43,9 @@ export default function (sequelize: Sequelize): typeof UserModel {
         type: DataTypes.ARRAY(DataTypes.STRING),
       },
       contacts: {
+        type: DataTypes.ARRAY(DataTypes.INTEGER),
+      },
+      cities: {
         type: DataTypes.ARRAY(DataTypes.INTEGER),
       },
     },

@@ -6,11 +6,14 @@ import { Request } from '@interfaces/requests.interface';
 import WSSService from '@services/wss.service';
 import { Op } from 'sequelize';
 import UserService from '@services/users.service';
+import { City } from '@interfaces/cities.interface';
+import CitiesService from '@services/cities.service';
 
 class RequestsService {
   public requests = DB.Requests;
   public users = DB.Users;
   public usersService = new UserService();
+  public citiesService = new CitiesService();
   public wssService = new WSSService();
 
   public async findAllRequests(): Promise<Request[]> {
@@ -55,9 +58,10 @@ class RequestsService {
     if (isEmpty(requestData)) throw new HttpException(400, "You're not request");
 
     const createRequestData: Request = (await this.requests.create(requestData)).get({ plain: true });
-    const guides = await this.users.findAll({ where: { role: { [Op.contains]: ['guide'] } }, raw: true });
-
+    const findCity: City = await this.citiesService.findCityByName(requestData.city);
+    const guides = await this.users.findAll({ where: { role: { [Op.contains]: ['guide'] }, cities: { [Op.contains]: [findCity.id] } }, raw: true });
     const guidesWithContacts = await Promise.all(guides.map(guide => this.usersService.mergeUser(guide)));
+
     this.wssService.broadcast('createRequest', {
       ...createRequestData,
       guides: guidesWithContacts,

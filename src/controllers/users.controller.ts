@@ -61,6 +61,18 @@ class UsersController {
     }
   };
 
+  public addCityForUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId: number = req.body.data.userId;
+      const cityId: number = req.body.data.cityId;
+      const createUserData: User = await this.userService.addCity(userId, cityId);
+
+      res.status(201).json({ data: createUserData, message: 'city success append' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   public deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = Number(req.params.id);

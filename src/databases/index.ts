@@ -5,6 +5,7 @@ import UserModel from '@models/users.model';
 import RequestModel from '@models/requests.model';
 import ContactsModel from '@models/contacts.model';
 import { logger } from '@utils/logger';
+import CitiesModel from '@models/cities.model';
 
 const { pool }: dbConfig = config.get('dbConfig');
 const host = process.env.DB_HOST;
@@ -36,6 +37,7 @@ sequelize.authenticate();
 
 const DB = {
   Users: UserModel(sequelize),
+  Cities: CitiesModel(sequelize),
   Requests: RequestModel(sequelize),
   Contacts: ContactsModel(sequelize),
   sequelize, // connection instance (RAW queries)

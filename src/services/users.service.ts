@@ -7,17 +7,21 @@ import { isEmpty } from '@utils/util';
 import ContactsService from '@services/contacts.service';
 import { hasNewValue } from '@utils/hasNewValue';
 import { uniqueArray } from '@utils/uniqueArray';
+import CitiesService from '@services/cities.service';
 
 class UserService {
   public users = DB.Users;
   public contactsService = new ContactsService();
+  public citiesService = new CitiesService();
 
   public async mergeUser(userData: User): Promise<UserExtend> {
-    const contacts = await Promise.all(userData.contacts.map(id => this.contactsService.findContactById(id)));
+    const contacts = await Promise.all((userData.contacts || []).map(id => this.contactsService.findContactById(id)));
+    const cities = await Promise.all((userData.cities || []).map(id => this.citiesService.findCityById(id)));
 
     return {
       ...userData,
       contacts,
+      cities,
     };
   }
 
@@ -46,6 +50,21 @@ class UserService {
     await this.users.update(findUser, { where: { id: userId } });
 
     return await this.users.findByPk(userId, { raw: true });
+  }
+
+  public async addCity(userId: number, cityId: number): Promise<User> {
+    if (isEmpty(userId)) throw new HttpException(400, "You're not userId");
+
+    const findUser: User = await this.users.findByPk(userId, { raw: true });
+    if (!findUser) throw new HttpException(409, "You're not user");
+
+    if ((findUser.cities && !findUser.cities.includes(cityId)) || findUser.cities === null) {
+      findUser.cities = [...(findUser.cities || []), cityId];
+      await this.users.update(findUser, { where: { id: userId } });
+
+      return await this.users.findByPk(userId, { raw: true });
+    }
+    return findUser;
   }
 
   public async setRoles(userId: number, roles: UserRole[]): Promise<User> {
@@ -94,7 +113,7 @@ class UserService {
     const newContacts = await this.contactsService.createContactList(userData.contacts);
 
     const hashedPassword = await bcrypt.hash(userData.password, 10);
-    return await this.users.create({ ...userData, password: hashedPassword, contacts: newContacts.map(({ id }) => id) });
+    return await this.users.create({ ...userData, password: hashedPassword, contacts: newContacts.map(({ id }) => id), cities: [] });
   }
 
   public async updateUser(userId: number, userData: CreateUserDto): Promise<User> {
