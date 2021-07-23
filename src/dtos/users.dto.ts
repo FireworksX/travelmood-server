@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsEnum, ValidateNested, IsArray } from 'class-validator';
+import { IsString, IsOptional, IsEnum, ValidateNested, IsArray, IsNumber } from 'class-validator';
 import { UserRole } from '@interfaces/users.interface';
 import { CreateContactDto } from '@dtos/contacts.dto';
 import { Type } from 'class-transformer';
@@ -32,4 +32,12 @@ export class CreateUserDto {
 
   @IsEnum(RoleEnum, { each: true })
   public role: UserRole[];
+}
+
+export class AddCityToUserDto {
+  @IsNumber()
+  public userId: number;
+
+  @IsNumber()
+  public cityId: number;
 }

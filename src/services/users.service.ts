@@ -8,15 +8,17 @@ import ContactsService from '@services/contacts.service';
 import { hasNewValue } from '@utils/hasNewValue';
 import { uniqueArray } from '@utils/uniqueArray';
 import CitiesService from '@services/cities.service';
+import { Op } from 'sequelize';
+
+const contactsService = new ContactsService();
+const citiesService = new CitiesService();
 
 class UserService {
   public users = DB.Users;
-  public contactsService = new ContactsService();
-  public citiesService = new CitiesService();
 
   public async mergeUser(userData: User): Promise<UserExtend> {
-    const contacts = await Promise.all((userData.contacts || []).map(id => this.contactsService.findContactById(id)));
-    const cities = await Promise.all((userData.cities || []).map(id => this.citiesService.findCityById(id)));
+    const contacts = await Promise.all((userData.contacts || []).map(id => contactsService.findContactById(id)));
+    const cities = await Promise.all((userData.cities || []).map(id => citiesService.findCityById(id)));
 
     return {
       ...userData,
@@ -25,9 +27,8 @@ class UserService {
     };
   }
 
-  public async findAllUser(): Promise<UserExtend[]> {
-    const users = await this.users.findAll({ raw: true });
-
+  public async findAllUser(where?: any): Promise<UserExtend[]> {
+    const users = await this.users.findAll({ where, raw: true });
     return await Promise.all(users.map(this.mergeUser));
   }
 
@@ -67,6 +68,21 @@ class UserService {
     return findUser;
   }
 
+  public async removeCity(userId: number, cityId: number): Promise<User> {
+    if (isEmpty(userId)) throw new HttpException(400, "You're not userId");
+
+    const findUser: User = await this.users.findByPk(userId, { raw: true });
+    if (!findUser) throw new HttpException(409, "You're not user");
+
+    if (findUser.cities && findUser.cities.includes(cityId)) {
+      findUser.cities = findUser.cities.filter(id => id !== cityId);
+      await this.users.update(findUser, { where: { id: userId } });
+
+      return await this.users.findByPk(userId, { raw: true });
+    }
+    return findUser;
+  }
+
   public async setRoles(userId: number, roles: UserRole[]): Promise<User> {
     if (isEmpty(userId)) throw new HttpException(400, "You're not userId");
 
@@ -97,7 +113,7 @@ class UserService {
     }
 
     if (findUser) {
-      const newContacts = await this.contactsService.createContactList(userData.contacts);
+      const newContacts = await contactsService.createContactList(userData.contacts);
       if (newContacts.length > 0) {
         await Promise.all(newContacts.map(contact => this.addContact(findUser.id, contact.id)));
       }
@@ -110,7 +126,7 @@ class UserService {
       throw new HttpException(409, `You're username ${userData.username} already exists`);
     }
 
-    const newContacts = await this.contactsService.createContactList(userData.contacts);
+    const newContacts = await contactsService.createContactList(userData.contacts);
 
     const hashedPassword = await bcrypt.hash(userData.password, 10);
     return await this.users.create({ ...userData, password: hashedPassword, contacts: newContacts.map(({ id }) => id), cities: [] });
@@ -123,7 +139,7 @@ class UserService {
     if (!findUser) throw new HttpException(409, "You're not user");
 
     const contacts = findUser.contacts;
-    const newContacts = await this.contactsService.createContactList(userData.contacts);
+    const newContacts = await contactsService.createContactList(userData.contacts);
 
     if (newContacts.length > 0) {
       await Promise.all(newContacts.map(contact => this.addContact(findUser.id, contact.id)));
